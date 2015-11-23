@@ -44,8 +44,13 @@ public class Wallpaper {
         return id;
     }
 
-    public String getTags() {
-        return tags;
+    public String[] getTags() {
+        String [] tagsArray = new String[0];
+        if (tags != null) {
+            tagsArray = tags.split(" ");
+        }
+        return tagsArray;
+
     }
 
     public Integer getCreated_at() {
