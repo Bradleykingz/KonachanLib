@@ -1,9 +1,11 @@
 package entities;
 
+import java.io.Serializable;
+
 /**
  * Created by Mxrck on 19/11/2015.
  */
-public class Wallpaper {
+public class Wallpaper implements Serializable {
 
     private Integer id;
     private String tags;
