@@ -1,4 +1,4 @@
-package entities;
+package com.marcomaldonado.konachan.entities;
 
 import java.io.Serializable;
 

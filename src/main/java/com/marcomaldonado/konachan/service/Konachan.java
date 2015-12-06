@@ -1,12 +1,12 @@
-package service;
+package com.marcomaldonado.konachan.service;
 
 import com.google.gson.Gson;
 import com.marcomaldonado.web.callback.WallpaperCallback;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
-import entities.Wallpaper;
-import entities.Tag;
+import com.marcomaldonado.konachan.entities.Wallpaper;
+import com.marcomaldonado.konachan.entities.Tag;
 
 import javax.ws.rs.core.MultivaluedMap;
 import java.util.ArrayList;

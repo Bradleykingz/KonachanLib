@@ -1,7 +1,7 @@
 import com.marcomaldonado.web.callback.WallpaperCallback;
-import entities.Tag;
-import entities.Wallpaper;
-import service.Konachan;
+import com.marcomaldonado.konachan.entities.Tag;
+import com.marcomaldonado.konachan.entities.Wallpaper;
+import com.marcomaldonado.konachan.service.Konachan;
 
 /**
  * Created by Mxrck on 22/11/2015.
@@ -10,7 +10,7 @@ public class Webservice {
 
     public static void main(String[] args) throws Exception {
         Konachan konachan = new Konachan(false);
-        konachan.posts(1, 10 ,new WallpaperCallback() {
+        konachan.search(1, 10, "suzumiya haruhi" ,new WallpaperCallback() {
             public void onSuccess(Wallpaper[] wallpapers, Tag[] tags) {
                 System.out.println("Wallpaper urls");
                 for (Wallpaper wallpaper :

@@ -1,4 +1,4 @@
-package service;
+package com.marcomaldonado.konachan.service;
 
 public class KonachanErrors {
 

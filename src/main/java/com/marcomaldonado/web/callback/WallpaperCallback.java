@@ -1,7 +1,7 @@
 package com.marcomaldonado.web.callback;
 
-import entities.Tag;
-import entities.Wallpaper;
+import com.marcomaldonado.konachan.entities.Tag;
+import com.marcomaldonado.konachan.entities.Wallpaper;
 
 /**
  * Created by Mxrck on 05/12/15.
