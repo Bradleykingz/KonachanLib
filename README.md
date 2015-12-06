@@ -87,23 +87,23 @@ Wallpaper methods
 String getAuthor
 int getCreated_at
 long getFile_size
-getFile_url
-getHeight
-getId
-getJpeg_file_size
-getJpeg_height
-getJpeg_url
-getJpeg_width
-getPreview_height
-getPreview_url
-getPreview_width
-getRating
-getSample_file_size
-getSample_height
-getSample_url
-getSample_width
-getScore
-getSource
-getStatus
-getTags
-getWidth
+String getFile_url
+int getHeight
+int getId
+long getJpeg_file_size
+int getJpeg_height
+String getJpeg_url
+int getJpeg_width
+int getPreview_height
+String getPreview_url
+int getPreview_width
+String getRating
+long getSample_file_size
+int getSample_height
+String getSample_url
+int getSample_width
+int getScore
+String getSource
+String getStatus
+String[] getTags
+int getWidth
