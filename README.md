@@ -84,26 +84,29 @@ for( Tag tag : tags ) {
 
 Wallpaper methods
 ----------------------------
-String getAuthor
-int getCreated_at
-long getFile_size
-String getFile_url
-int getHeight
-int getId
-long getJpeg_file_size
-int getJpeg_height
-String getJpeg_url
-int getJpeg_width
-int getPreview_height
-String getPreview_url
-int getPreview_width
-String getRating
-long getSample_file_size
-int getSample_height
-String getSample_url
-int getSample_width
-int getScore
-String getSource
-String getStatus
-String[] getTags
-int getWidth
+
+```java
+String getAuthor()
+int getCreated_at()
+long getFile_size()
+String getFile_url()
+int getHeight()
+int getId()
+long getJpeg_file_size()
+int getJpeg_height()
+String getJpeg_url()
+int getJpeg_width()
+int getPreview_height()
+String getPreview_url()
+int getPreview_width()
+String getRating()
+long getSample_file_size()
+int getSample_height()
+String getSample_url()
+int getSample_width()
+int getScore()
+String getSource()
+String getStatus()
+String[] getTags()
+int getWidth()
+```
