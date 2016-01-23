@@ -1,34 +1,36 @@
 package com.marcomaldonado.konachan.service;
 
 import com.google.gson.Gson;
+import com.marcomaldonado.web.callback.DownloadCallback;
 import com.marcomaldonado.web.callback.WallpaperCallback;
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.core.util.MultivaluedMapImpl;
 import com.marcomaldonado.konachan.entities.Wallpaper;
 import com.marcomaldonado.konachan.entities.Tag;
+import com.marcomaldonado.web.tools.helpers.HTMLHelper;
+import us.monoid.web.Resty;
 
-import javax.ws.rs.core.MultivaluedMap;
+import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by Mxrck on 22/11/2015.
  */
 public class Konachan {
 
-    private Client client;
-    private WebResource postsResource;
-    private WebResource tagsResource;
+    private Resty resty;
     private boolean safeForWork = false;
     private final String postsUrl = "http://konachan.com/post.json";
     private final String tagsUrl = "http://konachan.com/tag.json";
     private int limitRelatedTags = 5;
+    private HashMap<String, Object> queryParams;
+    private HTMLHelper htmlHelper = HTMLHelper.getInstance();
 
     public Konachan(boolean safeForWork) {
-        client = Client.create();
+        queryParams = new HashMap<String, Object>();
+        resty = new Resty();
         this.safeForWork = safeForWork;
-        this.postsResource = client.resource(postsUrl);
-        this.tagsResource = client.resource(tagsUrl);
     }
 
     public Wallpaper[] search(String search)
@@ -113,13 +115,21 @@ public class Konachan {
 
     private Wallpaper[] posts(int page, int limit, String search)
     {
-        MultivaluedMap queryParams = new MultivaluedMapImpl();
-        queryParams.add("limit", limit+"");
-        queryParams.add("page", page+"");
+        this.queryParams.put("limit", limit);
+        this.queryParams.put("page", page);
         if (search != null) {
-            queryParams.add("tags", this.cleanTag(search));
+            this.queryParams.put("tags", this.cleanTag(search));
         }
-        String response = this.postsResource.queryParams(queryParams).get(String.class);
+        String response = "[]";
+        try {
+            response = this.resty.text(
+                this.postsUrl+"?"+htmlHelper.urlEncodeUTF8(this.queryParams)
+            ).toString();
+        }
+        catch (Exception ex) {}
+        finally {
+            queryParams.clear();
+        }
         Gson gson = new Gson();
         Wallpaper[] wallpapers = gson.fromJson(response, Wallpaper[].class);
 
@@ -138,12 +148,21 @@ public class Konachan {
 
     public Tag[] tags(String tagname, int page, int limit)
     {
-        MultivaluedMap queryParams = new MultivaluedMapImpl();
-        queryParams.add("order", "count");
-        queryParams.add("page", page+"");
-        queryParams.add("limit", limit+"");
-        queryParams.add("name", this.cleanTag(tagname));
-        String response = this.tagsResource.queryParams(queryParams).get(String.class);
+        this.queryParams.put("order", "count");
+        this.queryParams.put("limit", limit);
+        this.queryParams.put("page", page);
+        this.queryParams.put("name", this.cleanTag(tagname));
+        String response = "[]";
+        System.out.println(this.tagsUrl+"?"+htmlHelper.urlEncodeUTF8(this.queryParams));
+        try {
+            response = this.resty.text(
+                    this.tagsUrl+"?"+htmlHelper.urlEncodeUTF8(this.queryParams)
+            ).toString();
+        }
+        catch (Exception ex) {}
+        finally {
+            queryParams.clear();
+        }
         Gson gson = new Gson();
         Tag[] tags = gson.fromJson(response, Tag[].class);
         return tags;
@@ -170,5 +189,56 @@ public class Konachan {
 
     public void setSafeForWork(boolean safeForWork) {
         this.safeForWork = safeForWork;
+    }
+
+    public String saveWallpaper(String filename, String folderPath, String imageURL) throws IOException {
+        BufferedInputStream in = null;
+        FileOutputStream fout = null;
+        in = new BufferedInputStream(new URL(imageURL).openStream());
+        fout = new FileOutputStream(folderPath + File.separator + filename);
+        final byte data[] = new byte[1024];
+        int count;
+        while ((count = in.read(data, 0, 1024)) != -1) {
+            fout.write(data, 0, count);
+        }
+        return folderPath + File.separator + filename;
+    }
+    public Thread saveWallpaper(final String filename, final String folderPath, final String imageURL, final DownloadCallback callback)
+    {
+        Thread thread = new Thread(new Runnable() {
+            public void run() {
+                try {
+                    if (callback != null) {
+                        callback.onStart();
+                    }
+                    String save = saveWallpaper(filename, folderPath, imageURL);
+                    if (save != null) {
+                        if (callback != null) {
+                            callback.onSuccess(save);
+                        }
+                    }
+                    else {
+                        if (callback != null) {
+                            callback.onFailure(
+                                    KonachanErrors.UNKNOW_ERROR,
+                                    KonachanErrors.message(KonachanErrors.UNKNOW_ERROR
+                                    )
+                            );
+                        }
+                    }
+                }
+                catch (Exception ex) {
+                    if (callback != null) {
+                        callback.onFailure(
+                                KonachanErrors.GENERIC_ERROR,
+                                KonachanErrors.message(KonachanErrors.GENERIC_ERROR
+                                )
+                        );
+                    }
+                }
+            }
+        });
+        thread.start();
+        return thread;
     }
 }

@@ -6,8 +6,8 @@ import com.marcomaldonado.konachan.entities.Wallpaper;
 /**
  * Created by Mxrck on 05/12/15.
  */
-public interface WallpaperCallback extends Callback {
+public interface DownloadCallback extends Callback {
 
-    void onSuccess(Wallpaper[] wallpapers, Tag[] tags);
+    void onSuccess(String route);
 
 }
