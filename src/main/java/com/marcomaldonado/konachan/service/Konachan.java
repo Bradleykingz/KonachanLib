@@ -6,11 +6,15 @@ import com.marcomaldonado.web.callback.WallpaperCallback;
 import com.marcomaldonado.konachan.entities.Wallpaper;
 import com.marcomaldonado.konachan.entities.Tag;
 import com.marcomaldonado.web.tools.helpers.HTMLHelper;
+import us.monoid.web.BinaryResource;
 import us.monoid.web.Resty;
 
-import java.io.*;
-import java.net.MalformedURLException;
-import java.net.URL;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -30,6 +34,7 @@ public class Konachan {
     public Konachan(boolean safeForWork) {
         queryParams = new HashMap<String, Object>();
         resty = new Resty();
+        resty.identifyAsMozilla();
         this.safeForWork = safeForWork;
     }
 
@@ -191,18 +196,26 @@ public class Konachan {
         this.safeForWork = safeForWork;
     }
 
-    public String saveWallpaper(String filename, String folderPath, String imageURL) throws IOException {
-        BufferedInputStream in = null;
-        FileOutputStream fout = null;
-        in = new BufferedInputStream(new URL(imageURL).openStream());
-        fout = new FileOutputStream(folderPath + File.separator + filename);
-        final byte data[] = new byte[1024];
-        int count;
-        while ((count = in.read(data, 0, 1024)) != -1) {
-            fout.write(data, 0, count);
+    public String saveWallpaper(String filename, String folderPath, String imageURL) {
+        if (filename == null) {
+            filename = imageURL.substring( imageURL.lastIndexOf('/')+1, imageURL.length() );
+            String filenameWithoutExtension = filename.substring(0, filename.lastIndexOf('.'));
+        }
+        Resty downloader = new Resty();
+        downloader.identifyAsMozilla();
+        File imageFile = new File(folderPath+File.separator+filename);
+        if (imageFile.exists()) return imageFile.getPath();
+        BinaryResource binaryResource = null;
+        try {
+            binaryResource = downloader.bytes(imageURL);
+            binaryResource.save(imageFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
         }
         return folderPath + File.separator + filename;
     }
+
     public Thread saveWallpaper(final String filename, final String folderPath, final String imageURL, final DownloadCallback callback)
     {
         Thread thread = new Thread(new Runnable() {
@@ -241,4 +254,5 @@ public class Konachan {
         thread.start();
         return thread;
     }
+
 }
